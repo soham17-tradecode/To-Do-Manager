@@ -18,7 +18,7 @@ public class Task {
     private String id;
     private String title;
 
-
+    private String description;
 
     private Priority priority;
 
@@ -26,7 +26,7 @@ public class Task {
     private category category;
 
     private boolean completed;
-    private String description;
+
 
 
 
