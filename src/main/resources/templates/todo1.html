@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+  <meta charset="UTF-8">
+  <title>To-Do Manager</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- ================= CSS ================= -->
+  <style>
+    body {
+        font-family: Arial, sans-serif;
+        background: linear-gradient(120deg, #89f7fe, #66a6ff);
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 1100px;
+        margin: 40px auto;
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    h1 {
+        text-align: center;
+        margin-bottom: 25px;
+    }
+
+    form {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+
+    form input,
+    form select,
+    form textarea {
+        padding: 10px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+        width: 100%;
+    }
+
+    textarea {
+        grid-column: span 3;
+        resize: none;
+    }
+
+    .form-actions {
+        grid-column: span 3;
+        text-align: right;
+    }
+
+    button {
+        padding: 10px 18px;
+        background: #4CAF50;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    button:hover {
+        background: #45a049;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        padding: 12px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+    }
+
+    th {
+        background: #f4f4f4;
+    }
+
+    .completed {
+        text-decoration: line-through;
+        color: gray;
+    }
+
+    .delete-btn {
+        background: #e74c3c;
+    }
+
+    .delete-btn:hover {
+        background: #c0392b;
+    }
+
+    .badge {
+        padding: 5px 10px;
+        border-radius: 12px;
+        color: white;
+        font-size: 12px;
+    }
+
+    .HIGH {
+        background: #e74c3c;
+    }
+
+    .MEDIUM {
+        background: #f39c12;
+    }
+
+    .LOW {
+        background: #2ecc71;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+  <h1>📝 To-Do Manager</h1>
+
+  <!-- ================= FORM ================= -->
+  <form id="todoForm" >
+    <input type="text"  placeholder="id" name="id" id="id" />
+
+    <input type="text"   name="title" placeholder="title" id="title" />
+
+    <input type="text"  name="completed" placeholder="Description" id="desc" />
+
+    <label>
+      <select id="priority"  name="priority">
+        <option value="HIGH">High</option>
+        <option value="MEDIUM">Medium</option>
+        <option value="LOW">Low</option>
+      </select>
+    </label>
+
+    <label>
+      <select id="category"   name="category">
+        <option value="STUDY">Study</option>
+        <option value="WORK">Work</option>
+        <option value="PERSONAL">Personal</option>
+      </select>
+    </label>
+
+    <label>
+      <select id="completed"  name="completed">
+        <option value="false">Pending</option>
+        <option value="true">Completed</option>
+      </select>
+    </label>
+
+
+
+
+
+
+    <button type="submit">Add Task</button>
+
+  </form>
+
+  <!-- ================= TABLE ================= -->
+  <table id="userTable">
+
+    <tr>
+      <th>ID</th>
+      <th>Title</th>
+      <th>Description</th>
+      <!-- <th>Due Date</th> -->
+      <th>Priority</th>
+      <th>Category</th>
+      <th>Status</th>
+      <!-- <th>Created At</th> -->
+      <th>Action</th>
+    </tr>
+
+    <!--    <tbody id="taskTable"></tbody>-->
+  </table>
+</div>
+<script>
+  document.getElementById("todoForm").addEventListener("submit", function (e) {
+      e.preventDefault(); // STOP normal form submit
+
+      const task = {
+          id: document.getElementById("id").value || null,
+          title: document.getElementById("title").value,
+          description: document.getElementById("desc").value,
+          priority: document.getElementById("priority").value,
+          category: document.getElementById("category").value,
+          completed: document.getElementById("completed").value === "true"
+      };
+
+      fetch("/api/tasks", {
+          method: "POST",
+          headers: {
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify(task)
+      })
+      .then(response => {
+          if (!response.ok) {
+              throw new Error("Failed to save task");
+          }
+          return response.json();
+      })
+      .then(savedTask => {
+          addRow(savedTask);
+          document.getElementById("todoForm").reset();
+      })
+      .catch(error => {
+          alert("Error saving task");
+          console.error(error);
+      });
+  });
+
+  function addRow(task) {
+      const table = document.getElementById("userTable");
+      const row = table.insertRow();
+
+      row.insertCell(0).innerText = task.id;
+      row.insertCell(1).innerText = task.title;
+      row.insertCell(2).innerText = task.description;
+      row.insertCell(3).innerText = task.priority;
+      row.insertCell(4).innerText = task.category;
+      row.insertCell(5).innerText = task.completed ? "Completed" : "Pending";
+
+      const actionCell = row.insertCell(6);
+      actionCell.innerHTML = `
+          <button onclick="deleteTask('${task.id}', this)">Delete</button>
+      `;
+  }
+
+  function deleteTask(id, btn) {
+      fetch(`/api/tasks/${id}`, {
+          method: "DELETE"
+      }).then(() => {
+          btn.closest("tr").remove();
+      });
+  }
+</script>
+
+
+
+<!--<script>-->
+<!--  let selectrow = null;-->
+<!--document.getElementById("todoForm").addEventListener("submit", function (e) {-->
+<!--  -->
+<!--  let id = document.getElementById("id").value;-->
+<!--      let title = document.getElementById("title").value;-->
+<!--      let Description = document.getElementById("desc").value;-->
+<!--      let Priority = document.getElementById("priority").value;-->
+<!--      let category = document.getElementById("category").value;-->
+<!--      let Status = document.getElementById("completed").value;-->
+
+<!--      if (id === "") {-->
+<!--          alert("Please enter both name and age");-->
+<!--          return;-->
+<!--      }-->
+<!--      else if (selectrow === null) {-->
+<!--          addRow(id, title, Description, Priority, category, Status);-->
+<!--      }-->
+
+<!--// reset form-->
+<!--      this.reset();-->
+<!--      selectrow=null;});-->
+
+
+
+
+<!--  function addRow(id, title, Description, Priority, category, Status) {-->
+<!--      let table = document.getElementById("userTable");-->
+<!--      let row = table.insertRow();-->
+
+
+<!--      let cell1 = row.insertCell(0);-->
+<!--      let cell2 = row.insertCell(1);-->
+<!--      let cell3 = row.insertCell(2);-->
+<!--      let cell4 = row.insertCell(3);-->
+<!--      let cell5 = row.insertCell(4);-->
+<!--      let cell6 = row.insertCell(5);-->
+
+<!--      cell1.innerText = id;-->
+<!--      cell2.innerText = title;-->
+<!--      cell3.innerText = Description;-->
+<!--      cell4.innerText = Priority;-->
+<!--      cell5.innerText = category;-->
+<!--      cell6.innerText = Status;-->
+
+<!--      let actionCell = row.insertCell(6);-->
+<!--      actionCell.innerHTML = `-->
+
+<!--      <button onclick="deleteRow(this)"> delete</button>-->
+
+<!--      `-->
+<!--  }-->
+
+<!--  function deleteRow(btn) {-->
+<!--      let row = btn.parentElement.parentElement;-->
+<!--      row.remove();-->
+<!--  }-->
+
+
+
+
+
+
+
+
+
+<!--</script>-->
+
+
+
+
+
+
+
+
+
+</body>
+
+</html>

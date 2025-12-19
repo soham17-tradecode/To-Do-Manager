@@ -24,12 +24,12 @@ public class taskService {
     {
         return  taskRepo.findAll();
     }
-    public void saveTo(Task task)
+    public Task saveTo(Task task)
     {
 //        task.setDuedate(LocalDateTime.now());
 //        task.setCreateat(LocalDateTime.now());
 
-        taskRepo.save(task);
+       return  taskRepo.save(task);
     }
     public void deleteById(String id)
     {

@@ -79,7 +79,7 @@ public class toDoListController {
 
         model.addAttribute("do", ts);
 
-        return "todo";
+        return "todo1";
     }
 
 
