@@ -1,281 +1,432 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <title>To-Do Manager</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="UTF-8">
+    <title>To-Do Manager</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- ================= CSS ================= -->
-  <style>
-    body {
-        font-family: Arial, sans-serif;
-        background: linear-gradient(120deg, #89f7fe, #66a6ff);
-        margin: 0;
-        padding: 0;
-    }
+    <!-- ================= CSS ================= -->
+    <style>
+        /* ================= THEME VARIABLES ================= */
+:root {
+    --body-bg: linear-gradient(120deg, #89f7fe, #66a6ff);
+    --container-bg: #ffffff;
+    --text-color: #000000;
+    --border-color: #cccccc;
+    --table-header-bg: #f4f4f4;
 
-    .container {
-        max-width: 1100px;
-        margin: 40px auto;
-        background: #ffffff;
-        padding: 25px;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
-    }
+    --button-bg: #4CAF50;
+    --button-hover: #45a049;
 
-    h1 {
-        text-align: center;
-        margin-bottom: 25px;
-    }
+    --delete-bg: #e74c3c;
+    --delete-hover: #c0392b;
+}
 
-    form {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        margin-bottom: 25px;
-    }
+/* ================= DARK THEME ================= */
+body.dark-theme {
+    --body-bg: linear-gradient(120deg, #141e30, #243b55);
+    --container-bg: #1e1e1e;
+    --text-color: #f1f1f1;
+    --border-color: #444444;
+    --table-header-bg: #2a2a2a;
 
-    form input,
-    form select,
-    form textarea {
-        padding: 10px;
-        border-radius: 6px;
-        border: 1px solid #ccc;
-        width: 100%;
-    }
+    --button-bg: #5cb85c;
+    --button-hover: #4cae4c;
 
-    textarea {
-        grid-column: span 3;
-        resize: none;
-    }
+    --delete-bg: #ff6b6b;
+    --delete-hover: #e55050;
+}
 
-    .form-actions {
-        grid-column: span 3;
-        text-align: right;
-    }
+/* ================= BASE STYLES ================= */
+body {
+    font-family: Arial, sans-serif;
+    background: var(--body-bg);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    transition: background 0.3s ease, color 0.3s ease;
+}
 
-    button {
-        padding: 10px 18px;
-        background: #4CAF50;
-        color: #fff;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-size: 14px;
-    }
+.container {
+    max-width: 1100px;
+    margin: 40px auto;
+    background-color: var(--container-bg);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
 
-    button:hover {
-        background: #45a049;
-    }
+/* ================= HEADINGS ================= */
+h1 {
+    text-align: center;
+    margin-bottom: 25px;
+}
 
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
+/* ================= FORM ================= */
+form {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+    margin-bottom: 25px;
+}
 
-    th,
-    td {
-        padding: 12px;
-        border-bottom: 1px solid #ddd;
-        text-align: center;
-    }
+form input,
+form select,
+form textarea {
+    padding: 10px;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background-color: transparent;
+    color: var(--text-color);
+    width: 100%;
+}
 
-    th {
-        background: #f4f4f4;
-    }
+textarea {
+    grid-column: span 3;
+    resize: none;
+}
 
-    .completed {
-        text-decoration: line-through;
-        color: gray;
-    }
+.form-actions {
+    grid-column: span 3;
+    text-align: right;
+}
 
-    .delete-btn {
-        background: #e74c3c;
-    }
+/* ================= BUTTONS ================= */
+button {
+    padding: 10px 18px;
+    background: var(--button-bg);
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s ease;
+}
 
-    .delete-btn:hover {
-        background: #c0392b;
-    }
+button:hover {
+    background: var(--button-hover);
+}
 
-    .badge {
-        padding: 5px 10px;
-        border-radius: 12px;
-        color: white;
-        font-size: 12px;
-    }
+.delete-btn {
+    background: var(--delete-bg);
+}
 
-    .HIGH {
-        background: #e74c3c;
-    }
+.delete-btn:hover {
+    background: var(--delete-hover);
+}
 
-    .MEDIUM {
-        background: #f39c12;
-    }
+/* ================= TABLE ================= */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-    .LOW {
-        background: #2ecc71;
-    }
-  </style>
+th,
+td {
+    padding: 12px;
+    border-bottom: 1px solid var(--border-color);
+    text-align: center;
+}
+
+th {
+    background-color: var(--table-header-bg);
+}
+
+/* ================= STATUS ================= */
+.completed {
+    text-decoration: line-through;
+    color: gray;
+}
+
+/* ================= BADGES ================= */
+.badge {
+    padding: 5px 10px;
+    border-radius: 12px;
+    color: #ffffff;
+    font-size: 12px;
+}
+
+.HIGH {
+    background: #e74c3c;
+}
+
+.MEDIUM {
+    background: #f39c12;
+}
+
+.LOW {
+    background: #2ecc71;
+}
+
+.custom-select {
+    position: relative;
+    cursor: pointer;
+    user-select: none;
+}
+
+.custom-select .selected {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    background: var(--container-bg);
+    color: var(--text-color);
+}
+
+.custom-select .options {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    right: 0;
+    background: var(--container-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    display: none;
+    z-index: 999;
+}
+
+.custom-select .options div {
+    padding: 10px;
+}
+
+.custom-select .options div:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+
+    </style>
 </head>
 
 <body>
 
 <div class="container">
-  <h1>📝 To-Do Manager</h1>
+    <div style="text-align: right;">
+        <button type="button" id="themeToggle" onclick="toggleTheme()">🌙</button>
+    </div>
+    <h1>📝 To-Do Manager</h1>
 
-  <!-- ================= FORM ================= -->
-  <form id="todoForm" >
-    <input type="text"  placeholder="id" name="id" id="id" />
+    <!-- ================= FORM ================= -->
+    <form id="todoForm">
+        <input type="text" placeholder="id" name="id" id="id"/>
 
-    <input type="text"   name="title" placeholder="title" id="title" />
+        <input type="text" name="title" placeholder="title" id="title"/>
 
-    <input type="text"  name="completed" placeholder="Description" id="desc" />
+        <input type="text" name="completed" placeholder="Description" id="desc"/>
 
-    <label>
-      <select id="priority"  name="priority">
-        <option value="HIGH">High</option>
-        <option value="MEDIUM">Medium</option>
-        <option value="LOW">Low</option>
-      </select>
-    </label>
-
-    <label>
-      <select id="category"   name="category">
-        <option value="STUDY">Study</option>
-        <option value="WORK">Work</option>
-        <option value="PERSONAL">Personal</option>
-      </select>
-    </label>
-
-    <label>
-      <select id="completed"  name="completed">
-        <option value="false">Pending</option>
-        <option value="true">Completed</option>
-      </select>
-    </label>
+        <div class="custom-select">
+            <div class="selected">High</div>
+            <div class="options">
+                <div data-value="HIGH">High</div>
+                <div data-value="MEDIUM">Medium</div>
+                <div data-value="LOW">Low</div>
+            </div>
+        </div>
+        <input type="hidden" id="priority" value="HIGH">
 
 
+        <div class="custom-select">
+            <div class="selected">Study</div>
+            <div class="options">
+                <div data-value="STUDY">Study</div>
+                <div data-value="WORK">Work</div>
+                <div data-value="PERSONAL">Personal</div>
+            </div>
+        </div>
+        <input type="hidden" id="category" value="STUDY">
+
+
+        <div class="custom-select">
+            <div class="selected">Pending</div>
+            <div class="options">
+                <div data-value="false">Pending</div>
+                <div data-value="true">Completed</div>
+            </div>
+        </div>
+        <input type="hidden" id="completed" value="false">
 
 
 
+        <button type="submit">Add Task</button>
 
-    <button type="submit">Add Task</button>
+    </form>
 
-  </form>
+    <!-- ================= TABLE ================= -->
+    <table id="userTable">
 
-  <!-- ================= TABLE ================= -->
-  <table id="userTable">
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Description</th>
+            <!-- <th>Due Date</th> -->
+            <th>Priority</th>
+            <th>Category</th>
+            <th>Status</th>
+            <!-- <th>Created At</th> -->
+            <th>Action</th>
+        </tr>
 
-    <tr>
-      <th>ID</th>
-      <th>Title</th>
-      <th>Description</th>
-      <!-- <th>Due Date</th> -->
-      <th>Priority</th>
-      <th>Category</th>
-      <th>Status</th>
-      <!-- <th>Created At</th> -->
-      <th>Action</th>
-    </tr>
-
-    <!--    <tbody id="taskTable"></tbody>-->
-  </table>
+        <!--    <tbody id="taskTable"></tbody>-->
+    </table>
 </div>
 <script>
-  document.getElementById("todoForm").addEventListener("submit", function (e) {
-      e.preventDefault(); // STOP normal form submit
+    //main js
+    document.getElementById("todoForm").addEventListener("submit", function (e) {
+        e.preventDefault(); // STOP normal form submit
 
-      const task = {
-          id: document.getElementById("id").value || null,
-          title: document.getElementById("title").value,
-          description: document.getElementById("desc").value,
-          priority: document.getElementById("priority").value,
-          category: document.getElementById("category").value,
-          completed: document.getElementById("completed").value === "true"
-      };
-        let url = "/api/tasks";
-        let method = "POST";
+        const task = {
+            id: document.getElementById("id").value || null,
+            title: document.getElementById("title").value,
+            description: document.getElementById("desc").value,
+            priority: document.getElementById("priority").value,
+            category: document.getElementById("category").value,
+            completed: document.getElementById("completed").value === "true"
+        };
+          let url = "/api/tasks";
+          let method = "POST";
 
-    // UPDATE MODE
-       if (editingTaskId !== null) {
-        url = `/api/tasks/${editingTaskId}`;
-        method = "PUT";
-       }
+      // UPDATE MODE
+         if (editingTaskId !== null) {
+          url = `/api/tasks/${editingTaskId}`;
+          method = "PUT";
+         }
 
 
-      fetch(url, {
-          method: method,
-          headers: {
-              "Content-Type": "application/json"
-          },
-          body: JSON.stringify(task)
+        fetch(url, {
+            method: method,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(task)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Failed to save task");
+            }
+            return response.json();
+        })
+         .then(() => {
+          // simplest & safest refresh
+          window.location.reload();
       })
-      .then(response => {
-          if (!response.ok) {
-              throw new Error("Failed to save task");
-          }
-          return response.json();
-      })
-       .then(() => {
-        // simplest & safest refresh
-        window.location.reload();
-    })
-      .catch(error => {
-          alert("Error saving task");
-          console.error(error);
-      });
-  });
+        .catch(error => {
+            alert("Error saving task");
+            console.error(error);
+        });
+    });
 
-  function addRow(task) {
-      const table = document.getElementById("userTable");
-      const row = table.insertRow();
+    function addRow(task) {
+        const table = document.getElementById("userTable");
+        const row = table.insertRow();
 
-      row.insertCell(0).innerText = task.id;
-      row.insertCell(1).innerText = task.title;
-      row.insertCell(2).innerText = task.description;
-      row.insertCell(3).innerText = task.priority;
-      row.insertCell(4).innerText = task.category;
-      row.insertCell(5).innerText = task.completed ? "Completed" : "Pending";
+        row.insertCell(0).innerText = task.id;
+        row.insertCell(1).innerText = task.title;
+        row.insertCell(2).innerText = task.description;
+        row.insertCell(3).innerText = task.priority;
+        row.insertCell(4).innerText = task.category;
+        row.insertCell(5).innerText = task.completed ? "Completed" : "Pending";
 
-      const actionCell = row.insertCell(6);
-      actionCell.innerHTML = `
-      <button>
-      <button onclick='editTask(${JSON.stringify(task)}, this)'>Edit</button>
-          <button onclick="deleteTask('${task.id}', this)">Delete</button>
-      `;
+        const actionCell = row.insertCell(6);
+        actionCell.innerHTML = `
+        <button>
+        <button onclick='editTask(${JSON.stringify(task)}, this)'>Edit</button>
+            <button onclick="deleteTask('${task.id}', this)">Delete</button>
+        `;
+    }
+
+    function deleteTask(id, btn) {
+        fetch(`/api/tasks/${id}`, {
+            method: "DELETE"
+        }).then(() => {
+            btn.closest("tr").remove();
+        });
+    }
+  let editingTaskId = null;
+
+  function editTask(task, btn) {
+      editingTaskId = task.id;
+
+      document.getElementById("title").value = task.title;
+      document.getElementById("desc").value = task.description;
+      document.getElementById("priority").value = task.priority;
+      document.getElementById("category").value = task.category;
+      document.getElementById("completed").value = task.completed.toString();
+
+      document.querySelector("button[type='submit']").innerText = "Update Task";
   }
+    window.onload = function () {
+      fetch("/api/tasks")
+          .then(res => res.json())
+          .then(tasks => tasks.forEach(addRow))
+          .catch(err => console.error(err));
+  };
+//dark theme js
+ document.addEventListener("DOMContentLoaded", function () {
 
-  function deleteTask(id, btn) {
-      fetch(`/api/tasks/${id}`, {
-          method: "DELETE"
-      }).then(() => {
-          btn.closest("tr").remove();
-      });
-  }
-let editingTaskId = null;
+    const toggleBtn = document.getElementById("themeToggle");
 
-function editTask(task, btn) {
-    editingTaskId = task.id;
+    if (!toggleBtn) {
+        console.error("Theme toggle button not found");
+        return;
+    }
 
-    document.getElementById("title").value = task.title;
-    document.getElementById("desc").value = task.description;
-    document.getElementById("priority").value = task.priority;
-    document.getElementById("category").value = task.category;
-    document.getElementById("completed").value = task.completed.toString();
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)");
 
-    document.querySelector("button[type='submit']").innerText = "Update Task";
-}
-  window.onload = function () {
-    fetch("/api/tasks")
-        .then(res => res.json())
-        .then(tasks => tasks.forEach(addRow))
-        .catch(err => console.error(err));
-};
+    function applyTheme(theme) {
+        if (theme === "dark") {
+            document.body.classList.add("dark-theme");
+            toggleBtn.textContent = "☀️";
+        } else {
+            document.body.classList.remove("dark-theme");
+            toggleBtn.textContent = "🌙";
+        }
+        localStorage.setItem("theme", theme);
+    }
 
+    window.toggleTheme = function () {
+        const isDark = document.body.classList.contains("dark-theme");
+        applyTheme(isDark ? "light" : "dark");
+    };
+
+    // INITIAL LOAD
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme) {
+        applyTheme(savedTheme);
+    } else {
+        applyTheme(prefersDark.matches ? "dark" : "light");
+    }
+
+});
+ //drop menu js
+
+    document.querySelectorAll(".custom-select").forEach(select => {
+    const selected = select.querySelector(".selected");
+    const options = select.querySelector(".options");
+    const hiddenInput = select.nextElementSibling;
+
+    selected.addEventListener("click", () => {
+        options.style.display =
+            options.style.display === "block" ? "none" : "block";
+    });
+
+    options.querySelectorAll("div").forEach(option => {
+        option.addEventListener("click", () => {
+            selected.textContent = option.textContent;
+            hiddenInput.value = option.dataset.value;
+            options.style.display = "none";
+        });
+    });
+});
+
+// Close when clicking outside
+document.addEventListener("click", e => {
+    document.querySelectorAll(".custom-select .options").forEach(opt => {
+        if (!opt.parentElement.contains(e.target)) {
+            opt.style.display = "none";
+        }
+    });
+});
 
 </script>
-
 
 
 <!--<script>-->
@@ -300,8 +451,6 @@ function editTask(task, btn) {
 <!--// reset form-->
 <!--      this.reset();-->
 <!--      selectrow=null;});-->
-
-
 
 
 <!--  function addRow(id, title, Description, Priority, category, Status) {-->
@@ -337,21 +486,7 @@ function editTask(task, btn) {
 <!--  }-->
 
 
-
-
-
-
-
-
-
 <!--</script>-->
-
-
-
-
-
-
-
 
 
 </body>
