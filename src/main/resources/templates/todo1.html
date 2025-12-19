@@ -194,9 +194,18 @@
           category: document.getElementById("category").value,
           completed: document.getElementById("completed").value === "true"
       };
+        let url = "/api/tasks";
+        let method = "POST";
 
-      fetch("/api/tasks", {
-          method: "POST",
+    // UPDATE MODE
+       if (editingTaskId !== null) {
+        url = `/api/tasks/${editingTaskId}`;
+        method = "PUT";
+       }
+
+
+      fetch(url, {
+          method: method,
           headers: {
               "Content-Type": "application/json"
           },
@@ -208,10 +217,10 @@
           }
           return response.json();
       })
-      .then(savedTask => {
-          addRow(savedTask);
-          document.getElementById("todoForm").reset();
-      })
+       .then(() => {
+        // simplest & safest refresh
+        window.location.reload();
+    })
       .catch(error => {
           alert("Error saving task");
           console.error(error);
@@ -231,6 +240,8 @@
 
       const actionCell = row.insertCell(6);
       actionCell.innerHTML = `
+      <button>
+      <button onclick='editTask(${JSON.stringify(task)}, this)'>Edit</button>
           <button onclick="deleteTask('${task.id}', this)">Delete</button>
       `;
   }
@@ -242,6 +253,27 @@
           btn.closest("tr").remove();
       });
   }
+let editingTaskId = null;
+
+function editTask(task, btn) {
+    editingTaskId = task.id;
+
+    document.getElementById("title").value = task.title;
+    document.getElementById("desc").value = task.description;
+    document.getElementById("priority").value = task.priority;
+    document.getElementById("category").value = task.category;
+    document.getElementById("completed").value = task.completed.toString();
+
+    document.querySelector("button[type='submit']").innerText = "Update Task";
+}
+  window.onload = function () {
+    fetch("/api/tasks")
+        .then(res => res.json())
+        .then(tasks => tasks.forEach(addRow))
+        .catch(err => console.error(err));
+};
+
+
 </script>
 
 
