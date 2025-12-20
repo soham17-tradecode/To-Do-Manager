@@ -1,18 +1,13 @@
 package com.example.demo.controller;
 
-import com.example.demo.model.Priority;
-import com.example.demo.model.category;
 import com.example.demo.model.Task;
 import com.example.demo.service.taskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 
 //@RestController
 @Controller
@@ -74,7 +69,7 @@ public class toDoListController {
 
     @GetMapping("/")
     public String getPage(Model model) {
-        Task ts =new Task();
+        Task ts = new Task();
 
 
         model.addAttribute("do", ts);
@@ -83,20 +78,12 @@ public class toDoListController {
     }
 
 
-
     @PostMapping("/registerUse")
     public String registerUse(@ModelAttribute("do") Task task) {
         taskService.saveTo(task);
         System.out.println(task);
         return "done";
     }
-
-
-
-
-
-
-
 
 
 }
